@@ -1,3 +1,11 @@
+# API Endpoints
+
+**GET** - https://hrze9qapaf.execute-api.us-east-1.amazonaws.com/dev/todos<br>
+**POST** - https://hrze9qapaf.execute-api.us-east-1.amazonaws.com/dev/todos<br>
+**PATCH** - https://hrze9qapaf.execute-api.us-east-1.amazonaws.com/dev/todos/{todoId}<br>
+**DELETE** - https://hrze9qapaf.execute-api.us-east-1.amazonaws.com/dev/todos/{todoId}<br>
+**POST** - https://hrze9qapaf.execute-api.us-east-1.amazonaws.com/dev/todos/{todoId}/attachment<br>
+
 # Serverless TODO
 
 To implement this project you need to implement a simple TODO application using AWS Lambda and Serverless framework. Search for all the `TODO:` comments in the code to find the placeholders that you need to implement.
