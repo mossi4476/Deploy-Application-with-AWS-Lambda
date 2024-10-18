@@ -1,13 +1,19 @@
 import Axios from 'axios'
 import jsonwebtoken from 'jsonwebtoken'
+import jwksClient from 'jwks-rsa'
 import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+// const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+
+const client = jwksClient({
+  jwksUri: 'https://dev-ig71llq28cpxeqsr.us.auth0.com/.well-known/jwks.json'
+})
 
 export async function handler(event) {
   try {
+    // console.log('event: ', event)
     const jwtToken = await verifyToken(event.authorizationToken)
 
     return {
@@ -43,11 +49,35 @@ export async function handler(event) {
 }
 
 async function verifyToken(authHeader) {
+  console.log('authHeader: ', authHeader)
   const token = getToken(authHeader)
-  const jwt = jsonwebtoken.decode(token, { complete: true })
 
-  // TODO: Implement token verification
-  return undefined;
+  const getKey = (header, callback) => {
+    client.getSigningKey(header.kid, function(err, key) {
+      if (err) {
+        console.log('Error getting signing key:', err);
+      }
+      // console.log('key: ', key)
+      const signingKey = key.publicKey || key.rsaPublicKey
+      callback(null, signingKey)
+    })
+  }
+
+  // console.log('getKey: ', getKey)
+
+  // const jwt = jsonwebtoken.decode(token, { complete: true })
+
+  const decodedJwt = await new Promise((resolve, reject) => {
+    jsonwebtoken.verify(token, getKey, { algorithms: ['RS256'] }, (error, decoded) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(decoded)
+      }
+    })
+  })
+
+  return decodedJwt;
 }
 
 function getToken(authHeader) {
